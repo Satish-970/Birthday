@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Happy Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,400&family=Sora:wght@300;400;500&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#faf6f0;
+    --ivory-2:#f2ece2;
+    --charcoal:#2b2a28;
+    --teal:#1f7a7a;
+    --teal-deep:#134f4f;
+    --blush:#e9b9a8;
+    --gold:#c79a3d;
+    --line: rgba(43,42,40,0.14);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ivory);
+    color:var(--charcoal);
+    font-family:'Sora', sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--blush); color:var(--teal-deep);}
+
+  .eyebrow{
+    font-family:'Sora', sans-serif;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    font-size:.68rem;
+    color:var(--teal);
+    opacity:.85;
+  }
+
+  /* ---------- ambient background ---------- */
+  #ambient{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+  }
+  #ambient span{
+    position:absolute;
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--blush);
+    opacity:.5;
+    animation:drift linear infinite;
+  }
+  @keyframes drift{
+    from{ transform:translateY(110vh) translateX(0) scale(1); }
+    to{ transform:translateY(-10vh) translateX(30px) scale(.6); opacity:0; }
+  }
+
+  section{ position:relative; z-index:1; }
+
+  /* ---------- HERO ---------- */
+  #hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:8vh 6vw 6vh;
+  }
+  .hero-title{
+    font-family:'Fraunces', serif;
+    font-weight:300;
+    font-size:clamp(2.6rem, 8vw, 6rem);
+    line-height:1.03;
+    margin:.6em 0 .2em;
+    letter-spacing:-0.01em;
+  }
+  .hero-title em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--teal-deep);
+  }
+  .hero-sub{
+    max-width:38ch;
+    font-size:1.05rem;
+    line-height:1.7;
+    color:#54524d;
+    margin-top:.8rem;
+  }
+  .scroll-cue{
+    margin-top:4.5rem;
+    font-family:'Caveat', cursive;
+    font-size:1.35rem;
+    color:var(--teal);
+    display:flex; flex-direction:column; align-items:center; gap:.4rem;
+  }
+  .scroll-cue svg{ animation:bob 2s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(8px);} }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .sec-head{
+    text-align:center;
+    max-width:640px;
+    margin:0 auto 4rem;
+    padding:0 6vw;
+  }
+  .sec-head h2{
+    font-family:'Fraunces', serif;
+    font-weight:400;
+    font-size:clamp(1.9rem, 4vw, 2.8rem);
+    margin:.5rem 0 0;
+  }
+
+  /* ---------- 3D GALLERY ---------- */
+  #gallery{ padding:10vh 6vw; }
+  .stage{
+    perspective: 1600px;
+    width:100%;
+    max-width: 980px;
+    margin: 0 auto;
+    height: 480px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .carousel{
+    position:relative;
+    width: 280px;
+    height: 380px;
+    transform-style:preserve-3d;
+    transition: transform 1s cubic-bezier(.65,.05,.36,1);
+  }
+  .card{
+    position:absolute;
+    inset:0;
+    border-radius: 18px;
+    overflow:hidden;
+    box-shadow: 0 30px 60px -20px rgba(19,79,79,0.35), 0 0 0 1px rgba(255,255,255,0.4) inset;
+    background:var(--ivory-2);
+    backface-visibility:hidden;
+  }
+  .card img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    filter: saturate(1.03);
+  }
+  .card .cap{
+    position:absolute; left:0; right:0; bottom:0;
+    padding: 1.1rem 1.2rem 1rem;
+    background: linear-gradient(to top, rgba(19,45,45,.72), rgba(19,45,45,0));
+    color:#fdfaf6;
+    font-family:'Caveat', cursive;
+    font-size:1.3rem;
+  }
+  .gallery-controls{
+    display:flex; justify-content:center; gap:1.4rem; margin-top:2.4rem;
+  }
+  .gc-btn{
+    width:46px; height:46px; border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--ivory);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition: all .25s ease;
+  }
+  .gc-btn:hover{ background:var(--teal); border-color:var(--teal); }
+  .gc-btn:hover svg{ stroke:var(--ivory); }
+  .gc-btn svg{ stroke:var(--teal-deep); transition:stroke .25s ease; }
+  .hint{
+    text-align:center; margin-top:1rem; font-size:.85rem; color:#8a8780;
+    font-family:'Sora',sans-serif; letter-spacing:.02em;
+  }
+
+  /* ---------- VIDEO ---------- */
+  #moment{ padding: 10vh 6vw 12vh; }
+  .video-frame{
+    max-width: 720px;
+    margin: 0 auto;
+    border-radius: 22px;
+    overflow:hidden;
+    box-shadow: 0 40px 80px -30px rgba(19,79,79,.4);
+    border: 6px solid var(--ivory);
+    background:#000;
+  }
+  video{ width:100%; display:block; }
+
+  /* ---------- CANDLE / SIGNATURE ---------- */
+  #candle-section{
+    min-height: 92vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding: 8vh 6vw;
+    background: radial-gradient(ellipse at 50% 30%, var(--ivory-2), var(--ivory) 70%);
+  }
+  .cake-wrap{ cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; }
+  .cake-svg{ width: min(260px, 60vw); height:auto; display:block; margin:0 auto; }
+  .flame{
+    transform-origin: 50% 100%;
+    animation: flicker 1.6s ease-in-out infinite;
+  }
+  @keyframes flicker{
+    0%,100%{ transform: scaleY(1) rotate(-2deg); }
+    50%{ transform: scaleY(1.12) rotate(2deg); }
+  }
+  .blown .flame{ opacity:0; animation:none; }
+  .smoke{ opacity:0; }
+  .blown .smoke{ opacity:1; animation: rise 1.8s ease-out forwards; }
+  @keyframes rise{
+    0%{ opacity:.6; transform:translateY(0) scale(1);}
+    100%{ opacity:0; transform:translateY(-40px) scale(1.8);}
+  }
+  .candle-note{
+    margin-top: 1.6rem;
+    font-family:'Caveat', cursive;
+    font-size:1.4rem;
+    color:var(--teal-deep);
+    min-height: 2.2rem;
+  }
+  #confetti-canvas{
+    position:fixed; inset:0; pointer-events:none; z-index:50;
+  }
+
+  .closing-msg{
+    max-width: 52ch;
+    margin-top: 2.4rem;
+    font-family:'Fraunces', serif;
+    font-weight:300;
+    font-style:italic;
+    font-size:clamp(1.2rem, 2.4vw, 1.55rem);
+    line-height:1.6;
+    color: var(--charcoal);
+    opacity:0;
+    transform: translateY(10px);
+    transition: opacity .9s ease, transform .9s ease;
+  }
+  .closing-msg.show{ opacity:1; transform:translateY(0); }
+
+  footer{
+    text-align:center;
+    padding: 4rem 6vw 3rem;
+    font-size:.78rem;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    color:#a19d94;
+  }
+
+  @media (max-width:560px){
+    .stage{ height:400px; }
+    .carousel{ width:230px; height:320px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="ambient"></div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="eyebrow">a small page, just for you</div>
+  <h1 class="hero-title">Happy Birthday,<br><em>beautiful soul</em></h1>
+  <p class="hero-sub">Some people just walk into a room and make it warmer. You're one of them &mdash; today, and every day.</p>
+  <div class="scroll-cue">
+    <span>a few moments, before the cake</span>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M4 11l6 6 6-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="sec-head">
+    <div class="eyebrow">turn it around</div>
+    <h2>A little gallery of you</h2>
+  </div>
+  <div class="stage">
+    <div class="carousel" id="carousel">
+      <div class="card"><img src="assets/IMG_20260520_191235.jpg" alt="A night out, smiling"><div class="cap">that smile, always</div></div>
+      <div class="card"><img src="assets/IMG-20260821-WA0015.jpg" alt="Laughing in the green"><div class="cap">caught mid-laugh</div></div>
+    </div>
+  </div>
+  <div class="gallery-controls">
+    <div class="gc-btn" id="prevBtn" aria-label="Previous">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 2L4 8l6 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="gc-btn" id="nextBtn" aria-label="Next">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2l6 6-6 6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <p class="hint">drag, or use the arrows</p>
+</section>
+
+<!-- VIDEO -->
+<section id="moment">
+  <div class="sec-head">
+    <div class="eyebrow">press play</div>
+    <h2>One more, in motion</h2>
+  </div>
+  <div class="video-frame">
+    <video controls playsinline poster="assets/IMG-20260821-WA0015.jpg">
+      <source src="assets/VID-20260817-WA0013.mp4" type="video/mp4">
+    </video>
+  </div>
+</section>
+
+<!-- CANDLE -->
+<section id="candle-section">
+  <div class="eyebrow">make a wish</div>
+  <div class="cake-wrap" id="cakeWrap">
+    <svg class="cake-svg" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="110" cy="188" rx="78" ry="14" fill="var(--blush)" opacity="0.55"/>
+      <rect x="42" y="140" width="136" height="46" rx="10" fill="#f0d9c9"/>
+      <rect x="42" y="140" width="136" height="14" rx="7" fill="#e9b9a8"/>
+      <rect x="58" y="104" width="104" height="42" rx="9" fill="#f7e6d6"/>
+      <rect x="58" y="104" width="104" height="12" rx="6" fill="#e9b9a8"/>
+      <rect x="105" y="60" width="10" height="46" rx="4" fill="#c79a3d"/>
+      <g class="flame">
+        <path d="M110 30c-7 10-11 17-11 24a11 11 0 0022 0c0-7-4-14-11-24z" fill="#e2793f"/>
+        <path d="M110 40c-4 6-6 10-6 14a6 6 0 0012 0c0-4-2-8-6-14z" fill="#f5c453"/>
+      </g>
+      <g class="smoke">
+        <path d="M110 26c-3 0 -4 -6 0 -8s5 6 2 8" stroke="#b9b4ab" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </svg>
+  </div>
+  <div class="candle-note" id="candleNote">tap the flame &mdash; go on</div>
+  <p class="closing-msg" id="closingMsg">Whatever you wished for &mdash; I hope it finds you. And if it doesn't come on its own, know that there are people who'll help you build it anyway. Happy birthday. You deserve every good thing this year holds.</p>
+</section>
+
+<footer>made with care, for someone who deserves it</footer>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+// ---- ambient particles ----
+const amb = document.getElementById('ambient');
+for(let i=0;i<26;i++){
+  const s = document.createElement('span');
+  const size = 3 + Math.random()*5;
+  s.style.width = s.style.height = size+'px';
+  s.style.left = Math.random()*100+'vw';
+  s.style.animationDuration = (10+Math.random()*14)+'s';
+  s.style.animationDelay = (Math.random()*14)+'s';
+  s.style.background = Math.random() > .5 ? 'var(--blush)' : 'var(--teal)';
+  amb.appendChild(s);
+}
+
+// ---- 3D carousel ----
+const carousel = document.getElementById('carousel');
+const cards = carousel.querySelectorAll('.card');
+const radius = 300;
+const n = cards.length;
+let current = 0;
+
+cards.forEach((card, i)=>{
+  const angle = (360/n) * i;
+  card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+});
+
+function updateCarousel(){
+  const angle = -(360/n) * current;
+  carousel.style.transform = `rotateY(${angle}deg)`;
+}
+document.getElementById('nextBtn').addEventListener('click', ()=>{ current++; updateCarousel(); });
+document.getElementById('prevBtn').addEventListener('click', ()=>{ current--; updateCarousel(); });
+
+// drag to rotate
+let isDown=false, startX=0, startAngle=0, dragAngle=0;
+const stage = document.querySelector('.stage');
+stage.addEventListener('pointerdown', e=>{ isDown=true; startX=e.clientX; startAngle=-(360/n)*current; });
+window.addEventListener('pointermove', e=>{
+  if(!isDown) return;
+  const dx = e.clientX - startX;
+  dragAngle = startAngle + dx*0.4;
+  carousel.style.transition='none';
+  carousel.style.transform = `rotateY(${dragAngle}deg)`;
+});
+window.addEventListener('pointerup', ()=>{
+  if(!isDown) return;
+  isDown=false;
+  carousel.style.transition='';
+  current = Math.round(-dragAngle/(360/n));
+  updateCarousel();
+});
+
+// gentle auto-tilt on mouse for extra depth
+stage.addEventListener('mousemove', e=>{
+  const r = stage.getBoundingClientRect();
+  const px = (e.clientX - r.left)/r.width - .5;
+  const py = (e.clientY - r.top)/r.height - .5;
+  carousel.style.transform += ` rotateX(${py * -6}deg)`;
+});
+stage.addEventListener('mouseleave', ()=> updateCarousel());
+
+// ---- candle blow / confetti ----
+const cakeWrap = document.getElementById('cakeWrap');
+const candleNote = document.getElementById('candleNote');
+const closingMsg = document.getElementById('closingMsg');
+let blown = false;
+
+cakeWrap.addEventListener('click', ()=>{
+  if(blown) return;
+  blown = true;
+  cakeWrap.classList.add('blown');
+  candleNote.textContent = "wish made. here's to you.";
+  closingMsg.classList.add('show');
+  burstConfetti();
+});
+
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+resize(); window.addEventListener('resize', resize);
+
+function burstConfetti(){
+  const colors = ['#1f7a7a','#e9b9a8','#c79a3d','#faf6f0','#134f4f'];
+  const rect = cakeWrap.getBoundingClientRect();
+  const originX = rect.left + rect.width/2;
+  const originY = rect.top + rect.height*0.25;
+  const particles = Array.from({length:110}, ()=>({
+    x: originX, y: originY,
+    vx: (Math.random()-0.5)*9,
+    vy: (Math.random()-1.6)*9,
+    size: 4+Math.random()*5,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    rot: Math.random()*Math.PI*2,
+    vr: (Math.random()-0.5)*0.3,
+    life: 0
+  }));
+  const gravity = 0.16;
+  function frame(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive = false;
+    particles.forEach(p=>{
+      p.life++;
+      p.vy += gravity;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      const fade = Math.max(0, 1 - p.life/140);
+      if(fade > 0){
+        alive = true;
+        ctx.save();
+        ctx.globalAlpha = fade;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+        ctx.restore();
+      }
+    });
+    if(alive) requestAnimationFrame(frame);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  frame();
+}
+</script>
+</body>
+</html>
