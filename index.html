@@ -284,6 +284,44 @@
     color:#a19d94;
   }
 
+  /* ---------- LIGHTBOX ---------- */
+  .polaroid img, .card img{ cursor:zoom-in; }
+  .lightbox{
+    position:fixed; inset:0; z-index:300;
+    background: rgba(20,18,16,.87);
+    display:none;
+    align-items:center; justify-content:center;
+    padding: 5vh 5vw;
+    cursor:zoom-out;
+    opacity:0;
+    transition: opacity .25s ease;
+  }
+  .lightbox.active{ display:flex; opacity:1; }
+  .lightbox-inner{
+    position:relative;
+    max-width:95vw; max-height:92vh;
+    transform: scale(.96);
+    transition: transform .25s ease;
+  }
+  .lightbox.active .lightbox-inner{ transform: scale(1); }
+  .lightbox-inner img{
+    display:block;
+    width:auto; height:auto;
+    max-width:95vw; max-height:92vh;
+    border-radius:6px;
+    box-shadow: 0 40px 100px rgba(0,0,0,.5);
+    cursor:default;
+  }
+  .lightbox-close{
+    position:absolute; top:-16px; right:-16px;
+    width:36px; height:36px; border-radius:50%;
+    background:var(--ivory); border:none;
+    font-size:1.4rem; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--charcoal);
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
+  }
+
   @media (max-width:560px){
     .stage{ height:400px; }
     .carousel{ width:230px; height:320px; }
@@ -296,9 +334,8 @@
 </head>
 <body>
 
-<div id="ambient">
-  <audio id="bgm" src="music.mp3" loop preload="none"></audio>
-</div>
+<div id="ambient"></div>
+<audio id="bgm" src="music.mp3" loop preload="auto" autoplay></audio>
 
 <!-- HERO -->
 <section id="hero">
@@ -405,6 +442,14 @@
 
 <canvas id="confetti-canvas"></canvas>
 
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+    <img id="lightboxImg" src="" alt="">
+  </div>
+</div>
+
 <script>
 // ---- ambient particles ----
 const amb = document.getElementById('ambient');
@@ -418,6 +463,26 @@ for(let i=0;i<26;i++){
   s.style.background = Math.random() > .5 ? 'var(--blush)' : 'var(--teal)';
   amb.appendChild(s);
 }
+
+// ---- background music: loads automatically, starts 1 minute in ----
+const bgm = document.getElementById('bgm');
+function startFromOneMinute(){
+  try{ bgm.currentTime = 60; }catch(e){}
+  bgm.play().catch(()=>{ /* browser blocked autoplay-with-sound; resumes on first interaction below */ });
+}
+if(bgm.readyState >= 1){
+  startFromOneMinute();
+} else {
+  bgm.addEventListener('loadedmetadata', startFromOneMinute, { once:true });
+}
+['click','touchstart','keydown'].forEach(evt=>{
+  document.addEventListener(evt, ()=>{
+    if(bgm.paused){
+      if(bgm.currentTime < 1) bgm.currentTime = 60;
+      bgm.play().catch(()=>{});
+    }
+  }, { once:true });
+});
 
 // ---- 3D carousel ----
 const carousel = document.getElementById('carousel');
@@ -465,6 +530,30 @@ stage.addEventListener('mousemove', e=>{
   carousel.style.transform += ` rotateX(${py * -6}deg)`;
 });
 stage.addEventListener('mouseleave', ()=> updateCarousel());
+
+// ---- lightbox: click any photo to view it at its own size ----
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+const lightboxClose = document.getElementById('lightboxClose');
+
+function openLightbox(src, alt){
+  lightboxImg.src = src;
+  lightboxImg.alt = alt || '';
+  lightbox.classList.add('active');
+}
+function closeLightbox(){
+  lightbox.classList.remove('active');
+  lightboxImg.src = '';
+}
+document.querySelectorAll('.polaroid img, .card img').forEach(img=>{
+  img.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    openLightbox(img.getAttribute('src'), img.getAttribute('alt'));
+  });
+});
+lightboxClose.addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
 
 // ---- candle blow / confetti ----
 const cakeWrap = document.getElementById('cakeWrap');
