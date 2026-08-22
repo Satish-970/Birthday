@@ -467,7 +467,7 @@ for(let i=0;i<26;i++){
 // ---- background music: loads automatically, starts 1 minute in ----
 const bgm = document.getElementById('bgm');
 function startFromOneMinute(){
-  try{ bgm.currentTime = 60; }catch(e){}
+  try{ bgm.currentTime = 65; }catch(e){}
   bgm.play().catch(()=>{ /* browser blocked autoplay-with-sound; resumes on first interaction below */ });
 }
 if(bgm.readyState >= 1){
