@@ -112,6 +112,45 @@
     margin:.5rem 0 0;
   }
 
+  /* ---------- PHASES (polaroid grids) ---------- */
+  .phase{ padding:9vh 6vw; }
+  .phase-num{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:.95rem;
+    color:var(--gold);
+    margin-bottom:.6rem;
+  }
+  .phase-copy{
+    max-width:52ch;
+    font-size:1.02rem;
+    line-height:1.75;
+    color:#5a584f;
+    margin: .8rem auto 3rem;
+  }
+  .polagrid{
+    display:flex; flex-wrap:wrap;
+    align-items:flex-start; justify-content:center;
+    gap: 1.6rem 1.3rem;
+    max-width: 940px;
+    margin: 0 auto;
+  }
+  .polaroid{
+    background:#fffdfa;
+    padding: 9px 9px 28px;
+    box-shadow: 0 16px 30px -14px rgba(30,25,20,.35), 0 0 0 1px rgba(0,0,0,.03);
+    width: 190px;
+    border-radius:2px;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .polaroid:hover{ transform: translateY(-5px) rotate(0deg) !important; box-shadow: 0 22px 36px -14px rgba(30,25,20,.4); }
+  .polaroid img{ width:100%; height:210px; object-fit:cover; object-position:center 20%; filter:saturate(1.03); display:block; }
+  .polaroid .cap{ font-family:'Caveat', cursive; font-size:1.12rem; color:#4a473f; margin-top:.5rem; text-align:center; }
+  .r1{ transform: rotate(-5deg); }
+  .r2{ transform: rotate(4deg); }
+  .r3{ transform: rotate(-2deg); }
+  .r4{ transform: rotate(6deg); }
+
   /* ---------- 3D GALLERY ---------- */
   #gallery{ padding:10vh 6vw; }
   .stage{
@@ -270,11 +309,41 @@
   </div>
 </section>
 
+<!-- PHASE ONE -->
+<section class="phase" id="phase-one">
+  <div class="sec-head">
+    <div class="phase-num">Phase One</div>
+    <h2>Where It Began</h2>
+    <p class="phase-copy">Friendships like this rarely start with a plan. A hello in a hallway, an ID badge, a shared lunch table &mdash; and somehow, that turned out to be the beginning of something that's lasted.</p>
+  </div>
+  <div class="polagrid">
+    <div class="polaroid r1"><img src="IMG_20260514_182748.jpg" alt="office selfie"><div class="cap">the office days</div></div>
+    <div class="polaroid r2"><img src="IMG-20260215-WA0019.jpg" alt="temple visit"><div class="cap">temple mornings</div></div>
+    <div class="polaroid r3"><img src="IMG-20260806-WA0007.jpg" alt="portrait indoors"><div class="cap">just another Tuesday</div></div>
+  </div>
+</section>
+
+<!-- PHASE TWO -->
+<section class="phase" id="phase-two">
+  <div class="sec-head">
+    <div class="phase-num">Phase Two</div>
+    <h2>Through The Days</h2>
+    <p class="phase-copy">Then came the in-between &mdash; the years of simply showing up. Festivals in borrowed colours, temple steps and city statues, late walks home when no one really wanted the night to end.</p>
+  </div>
+  <div class="polagrid">
+    <div class="polaroid r2"><img src="IMG-20260524-WA0031.jpg" alt="night out with friends"><div class="cap">late night, good company</div></div>
+    <div class="polaroid r4"><img src="IMG_20260515_201010.jpg" alt="walking home together"><div class="cap">walking each other home</div></div>
+    <div class="polaroid r1"><img src="IMG-20260403-WA0007.jpg" alt="festival outfit"><div class="cap">festival colours</div></div>
+    <div class="polaroid r3"><img src="IMG_20260221_141003.jpg" alt="trip to a statue"><div class="cap">chasing new places</div></div>
+  </div>
+</section>
+
 <!-- GALLERY -->
 <section id="gallery">
   <div class="sec-head">
+    <div class="phase-num">Phase Three</div>
     <div class="eyebrow">turn it around</div>
-    <h2>A little gallery of you</h2>
+    <h2>Here's To You</h2>
   </div>
   <div class="stage">
     <div class="carousel" id="carousel">
@@ -308,7 +377,7 @@
 
 <!-- CANDLE -->
 <section id="candle-section">
-  <div class="eyebrow">make a wish</div>
+  <div class="eyebrow">make a wish, once more</div>
   <div class="cake-wrap" id="cakeWrap">
     <svg class="cake-svg" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="110" cy="188" rx="78" ry="14" fill="var(--blush)" opacity="0.55"/>
