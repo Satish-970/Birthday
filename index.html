@@ -39,6 +39,84 @@
     opacity:.85;
   }
 
+  /* ---------- lock screen ---------- */
+  body.locked{ overflow:hidden; height:100vh; }
+  body.locked #site-content{ display:none; }
+  #lockScreen{
+    position:fixed; inset:0; z-index:1000;
+    background: radial-gradient(ellipse at 50% 30%, var(--ivory-2), var(--ivory) 70%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding: 6vh 6vw;
+    transition: opacity .5s ease;
+  }
+  #lockScreen.hidden{ opacity:0; pointer-events:none; }
+  .lock-card{
+    max-width: 360px;
+    width:100%;
+  }
+  .lock-title{
+    font-family:'Fraunces', serif;
+    font-weight:400;
+    font-size: clamp(1.6rem, 5vw, 2.1rem);
+    margin: .6rem 0 .4rem;
+  }
+  .lock-sub{
+    font-size: .95rem;
+    color:#5a584f;
+    line-height:1.6;
+    margin-bottom: 1.8rem;
+  }
+  .lock-form{
+    display:flex; flex-direction:column; align-items:center; gap: .9rem;
+  }
+  #lockInput{
+    width:100%;
+    font-family:'Sora', sans-serif;
+    font-size: 1rem;
+    padding: .85rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #fffdfa;
+    color: var(--charcoal);
+    text-align:center;
+    letter-spacing:.04em;
+    outline:none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  #lockInput:focus{ border-color: var(--teal); box-shadow: 0 0 0 3px rgba(31,122,122,.14); }
+  #lockSubmit{
+    font-family:'Sora', sans-serif;
+    font-size: .82rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    padding: .85rem 1.6rem;
+    border-radius: 999px;
+    border: none;
+    background: var(--teal);
+    color: var(--ivory);
+    cursor:pointer;
+    transition: background .2s ease, transform .2s ease;
+  }
+  #lockSubmit:hover{ background: var(--teal-deep); transform: translateY(-1px); }
+  .lock-error{
+    font-family:'Caveat', cursive;
+    font-size: 1.05rem;
+    color: #b5573f;
+    min-height: 1.4rem;
+    opacity:0;
+    transition: opacity .2s ease;
+  }
+  .lock-error.show{ opacity:1; }
+  .lock-shake{ animation: shake .4s ease; }
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    20%{ transform: translateX(-8px); }
+    40%{ transform: translateX(8px); }
+    60%{ transform: translateX(-6px); }
+    80%{ transform: translateX(6px); }
+  }
+
   /* ---------- ambient background ---------- */
   #ambient{
     position:fixed; inset:0; z-index:0; pointer-events:none;
@@ -332,10 +410,26 @@
   }
 </style>
 </head>
-<body>
+<body class="locked">
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="eyebrow">this page is just for you</div>
+    <h1 class="lock-title">A little something,<br>waiting inside.</h1>
+    <p class="lock-sub">Enter the password to open it.</p>
+    <div class="lock-form">
+      <input id="lockInput" type="password" autocomplete="off" placeholder="password" />
+      <button id="lockSubmit">Unlock</button>
+      <div class="lock-error" id="lockError">that's not quite it &mdash; try again</div>
+    </div>
+  </div>
+</div>
+
+<div id="site-content">
 
 <div id="ambient"></div>
-<audio id="bgm" src="music.mp3" loop preload="auto" autoplay></audio>
+<audio id="bgm" src="music.mp3" loop preload="auto"></audio>
 
 <!-- HERO -->
 <section id="hero">
@@ -450,7 +544,39 @@
   </div>
 </div>
 
+</div><!-- /#site-content -->
+
 <script>
+// ---- password lock ----
+// Note: this is a simple front-end gate for a personal keepsake page, not
+// real security. Anyone viewing the page source could bypass it.
+const CORRECT_PASSWORD = 'vidmahi';
+const lockScreen = document.getElementById('lockScreen');
+const lockInput = document.getElementById('lockInput');
+const lockSubmit = document.getElementById('lockSubmit');
+const lockError = document.getElementById('lockError');
+const lockCard = document.querySelector('.lock-card');
+
+function tryUnlock(){
+  const value = (lockInput.value || '').trim().toLowerCase();
+  if(value === CORRECT_PASSWORD){
+    document.body.classList.remove('locked');
+    lockScreen.classList.add('hidden');
+    setTimeout(()=>{ lockScreen.style.display = 'none'; }, 550);
+    startMusic();
+  } else {
+    lockError.classList.add('show');
+    lockCard.classList.remove('lock-shake');
+    void lockCard.offsetWidth; // restart animation
+    lockCard.classList.add('lock-shake');
+    lockInput.value = '';
+    lockInput.focus();
+  }
+}
+lockSubmit.addEventListener('click', tryUnlock);
+lockInput.addEventListener('keydown', e=>{ if(e.key === 'Enter') tryUnlock(); });
+window.addEventListener('load', ()=> lockInput.focus());
+
 // ---- ambient particles ----
 const amb = document.getElementById('ambient');
 for(let i=0;i<26;i++){
@@ -464,24 +590,29 @@ for(let i=0;i<26;i++){
   amb.appendChild(s);
 }
 
-// ---- background music: loads automatically, starts 1 minute in ----
+// ---- background music: starts once the page is unlocked, 1 minute in ----
 const bgm = document.getElementById('bgm');
-function startFromOneMinute(){
-  try{ bgm.currentTime = 65; }catch(e){}
-  bgm.play().catch(()=>{ /* browser blocked autoplay-with-sound; resumes on first interaction below */ });
-}
-if(bgm.readyState >= 1){
-  startFromOneMinute();
-} else {
-  bgm.addEventListener('loadedmetadata', startFromOneMinute, { once:true });
+let musicStarted = false;
+function startMusic(){
+  if(musicStarted) return;
+  musicStarted = true;
+  function startFromOneMinute(){
+    try{ bgm.currentTime = 65; }catch(e){}
+    bgm.play().catch(()=>{ /* browser blocked autoplay-with-sound; resumes on first interaction below */ });
+  }
+  if(bgm.readyState >= 1){
+    startFromOneMinute();
+  } else {
+    bgm.addEventListener('loadedmetadata', startFromOneMinute, { once:true });
+  }
 }
 ['click','touchstart','keydown'].forEach(evt=>{
   document.addEventListener(evt, ()=>{
-    if(bgm.paused){
+    if(musicStarted && bgm.paused){
       if(bgm.currentTime < 1) bgm.currentTime = 60;
       bgm.play().catch(()=>{});
     }
-  }, { once:true });
+  });
 });
 
 // ---- 3D carousel ----
